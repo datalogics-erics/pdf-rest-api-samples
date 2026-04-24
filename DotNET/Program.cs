@@ -16,6 +16,7 @@ static void PrintUsage()
     Console.Error.WriteLine("    pdf <file>                         Convert file to PDF");
     Console.Error.WriteLine("    pdfa <file>                        Convert to PDF/A");
     Console.Error.WriteLine("    pdfx <file>                        Convert to PDF/X");
+    Console.Error.WriteLine("    tdm-reserved-pdf <pdf>             Apply TDM rights metadata");
     Console.Error.WriteLine("    png|jpg|gif|bmp <file>             Convert to image format");
     Console.Error.WriteLine("    word|excel|powerpoint|tif <file>   Convert to Office/TIFF");
     Console.Error.WriteLine("  Info / Extract:");
@@ -67,6 +68,7 @@ static void PrintUsage()
     Console.Error.WriteLine("    rasterized-pdf-multipart <pdf>     Rasterize PDF");
     Console.Error.WriteLine("    pdfa-multipart <file>              Convert to PDF/A");
     Console.Error.WriteLine("    pdfx-multipart <file>              Convert to PDF/X");
+    Console.Error.WriteLine("    tdm-reserved-pdf-multipart <pdf>   Apply TDM rights metadata");
     Console.Error.WriteLine("    png-multipart|jpg-multipart|gif-multipart|bmp-multipart|tif-multipart <file>  Convert to image");
     Console.Error.WriteLine("    word-multipart|excel-multipart|powerpoint-multipart <file>  Convert Office");
     Console.Error.WriteLine("  Info / Extract:");
@@ -290,11 +292,17 @@ switch (cmd)
     case "pdfx-multipart":
         await Samples.EndpointExamples.MultipartPayload.Pdfx.Execute(rest);
         break;
+    case "tdm-reserved-pdf-multipart":
+        await Samples.EndpointExamples.MultipartPayload.TdmReservedPdf.Execute(rest);
+        break;
     case "pdfa":
         await Samples.EndpointExamples.JsonPayload.Pdfa.Execute(rest);
         break;
     case "pdfx":
         await Samples.EndpointExamples.JsonPayload.Pdfx.Execute(rest);
+        break;
+    case "tdm-reserved-pdf":
+        await Samples.EndpointExamples.JsonPayload.TdmReservedPdf.Execute(rest);
         break;
     case "excel":
         await Samples.EndpointExamples.JsonPayload.Excel.Execute(rest);
