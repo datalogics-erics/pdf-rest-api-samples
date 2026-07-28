@@ -36,12 +36,30 @@ public class PDFWithAddedShapes {
 
     JSONArray shapes =
         new JSONArray()
-            .put(new JSONObject().put("type", "rectangle").put("page", 1).put("x", 54).put("y", 540)
-                .put("width", 504).put("height", 108).put("fill_color_rgb", "245,247,250")
-                .put("stroke_color_rgb", "26,72,112").put("stroke_width", 1).put("tag_is_artifact", true))
-            .put(new JSONObject().put("type", "line").put("page", 1).put("x1", 72).put("y1", 576)
-                .put("x2", 540).put("y2", 576).put("stroke_color_rgb", "26,72,112").put("stroke_width", 1.5)
-                .put("tag_actual_text", "Review section divider").put("tag_structure_type", "Figure"));
+            .put(
+                new JSONObject()
+                    .put("type", "rectangle")
+                    .put("page", 1)
+                    .put("x", 54)
+                    .put("y", 540)
+                    .put("width", 504)
+                    .put("height", 108)
+                    .put("fill_color_rgb", "245,247,250")
+                    .put("stroke_color_rgb", "26,72,112")
+                    .put("stroke_width", 1)
+                    .put("tag_is_artifact", true))
+            .put(
+                new JSONObject()
+                    .put("type", "line")
+                    .put("page", 1)
+                    .put("x1", 72)
+                    .put("y1", 576)
+                    .put("x2", 540)
+                    .put("y2", 576)
+                    .put("stroke_color_rgb", "26,72,112")
+                    .put("stroke_width", 1.5)
+                    .put("tag_actual_text", "Review section divider")
+                    .put("tag_structure_type", "Figure"));
     JSONObject payload =
         new JSONObject()
             .put("id", inputId)
