@@ -41,6 +41,8 @@ static void PrintUsage()
     Console.Error.WriteLine("    pdf-with-added-attachment <pdf> <file>  Attach file");
     Console.Error.WriteLine("    pdf-with-converted-colors <pdf>    Convert colors to profile");
     Console.Error.WriteLine("    pdf-with-added-text <pdf>          Add text objects");
+    Console.Error.WriteLine("    pdf-with-added-shapes <pdf>        Add review-panel shapes");
+    Console.Error.WriteLine("    pdf-with-added-tables <pdf>        Add tagged project-status table");
     Console.Error.WriteLine("    pdf-with-acroforms <pdf>           Add acroforms");
     Console.Error.WriteLine("    pdf-with-page-boxes-set <pdf>      Set page boxes");
     Console.Error.WriteLine("  Redaction:");
@@ -92,6 +94,8 @@ static void PrintUsage()
     Console.Error.WriteLine("    pdf-with-added-attachment-multipart <pdf> <file>  Attach file");
     Console.Error.WriteLine("    pdf-with-converted-colors-multipart <pdf>  Convert colors to profile");
     Console.Error.WriteLine("    pdf-with-added-text-multipart <pdf>   Add text objects");
+    Console.Error.WriteLine("    pdf-with-added-shapes-multipart <pdf> Add review-panel shapes");
+    Console.Error.WriteLine("    pdf-with-added-tables-multipart <pdf> Add tagged project-status table");
     Console.Error.WriteLine("    pdf-with-acroforms-multipart <pdf>    Add acroforms");
     Console.Error.WriteLine("    pdf-with-page-boxes-set-multipart <pdf>  Set page boxes");
     Console.Error.WriteLine("  Redaction:");
@@ -417,6 +421,18 @@ switch (cmd)
         break;
     case "pdf-with-added-text-multipart":
         await Samples.EndpointExamples.MultipartPayload.PdfWithAddedText.Execute(rest);
+        break;
+    case "pdf-with-added-shapes":
+        await Samples.EndpointExamples.JsonPayload.PdfWithAddedShapes.Execute(rest);
+        break;
+    case "pdf-with-added-shapes-multipart":
+        await Samples.EndpointExamples.MultipartPayload.PdfWithAddedShapes.Execute(rest);
+        break;
+    case "pdf-with-added-tables":
+        await Samples.EndpointExamples.JsonPayload.PdfWithAddedTables.Execute(rest);
+        break;
+    case "pdf-with-added-tables-multipart":
+        await Samples.EndpointExamples.MultipartPayload.PdfWithAddedTables.Execute(rest);
         break;
     case "pdf-with-acroforms":
         await Samples.EndpointExamples.JsonPayload.PdfWithAcroforms.Execute(rest);
