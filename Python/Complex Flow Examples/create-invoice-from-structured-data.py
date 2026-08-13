@@ -123,21 +123,21 @@ def build_header_text_objects(metadata, style):
     add("1", 405, 682, f'Issued {metadata["issueDate"]}', 9, muted, 153)
     add("1", 405, 668, f'Due {metadata["dueDate"]}', 9, muted, 153)
 
-    add("1", 66, 632, "FROM", 8, primary, 220, "H2", True)
-    add("1", 66, 616, seller["name"], 9, "34,34,34", 220, bold=True)
-    add("1", 66, 602, seller["addressLine1"], 8, muted, 220)
-    add("1", 66, 590, f'{seller["city"]}, {seller["region"]} {seller["postalCode"]}', 8, muted, 220)
-    add("1", 318, 632, "BILL TO", 8, primary, 210, "H2", True)
-    add("1", 318, 616, customer["name"], 9, "34,34,34", 210, bold=True)
-    add("1", 318, 602, customer["addressLine1"], 8, muted, 210)
+    add("1", 66, 632, "FROM", 8, primary, 216, "H2", True)
+    add("1", 66, 616, seller["name"], 9, "34,34,34", 216, bold=True)
+    add("1", 66, 602, seller["addressLine1"], 8, muted, 216)
+    add("1", 66, 590, f'{seller["city"]}, {seller["region"]} {seller["postalCode"]}', 8, muted, 216)
+    add("1", 330, 632, "BILL TO", 8, primary, 216, "H2", True)
+    add("1", 330, 616, customer["name"], 9, "34,34,34", 216, bold=True)
+    add("1", 330, 602, customer["addressLine1"], 8, muted, 216)
     add(
         "1",
-        318,
+        330,
         590,
         f'{customer["city"]}, {customer["region"]} {customer["postalCode"]}',
         8,
         muted,
-        210,
+        216,
     )
 
     return text
@@ -285,7 +285,7 @@ def build_table(metadata, style, line_items, subtotal, tax, total):
     return {
         "page": 1,
         "x": 54,
-        "y": 449,
+            "y": 510,
         "width": TABLE_WIDTH,
         "columns": [{"width": width} for width in TABLE_COLUMN_WIDTHS],
         "continuation_page_top_margin": 85,
@@ -317,7 +317,19 @@ def build_header_shape_objects(style):
             "page": 1,
             "x": 54,
             "y": 574,
-            "width": 504,
+            "width": 240,
+            "height": 78,
+            "fill_color_rgb": rgb_string(style["accentColorRgb"]),
+            "stroke_color_rgb": border_color,
+            "stroke_width": 0.5,
+            "tag_is_artifact": True,
+        },
+        {
+            "type": "rectangle",
+            "page": 1,
+            "x": 318,
+            "y": 574,
+            "width": 240,
             "height": 78,
             "fill_color_rgb": rgb_string(style["accentColorRgb"]),
             "stroke_color_rgb": border_color,
