@@ -1,0 +1,10 @@
+{
+  "invoiceNumber": "INV-2026-0417",
+  "issueDate": "2026-04-17",
+  "dueDate": "2026-05-17",
+  "taxRate": 0.0825,
+  "paymentTerms": "Payment is due within 30 days. ACH payments may be submitted through the fictional payment portal. Please include the invoice number with all payments.",
+  "notes": "Thank you for choosing Northstar Sample Supply. This invoice uses fictional data and demonstrates PDF generation from structured input files.",
+  "seller": {"name": "Northstar Sample Supply", "taxId": "EIN 84-5162047", "addressLine1": "410 Fictional Market Street", "city": "Port Azure", "region": "WA", "postalCode": "98104"},
+  "customer": {"name": "Harbor & Pine Community Works", "addressLine1": "88 Cedar Walk", "city": "Lakefield", "region": "OR", "postalCode": "97035"}
+}
