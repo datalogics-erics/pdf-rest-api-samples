@@ -1,4 +1,12 @@
-"""Generate a tagged invoice from JSON and CSV input using pdfRest."""
+"""Generate a tagged invoice from JSON and CSV input using pdfRest.
+
+Set ``PDFREST_API_KEY`` in the environment before running this sample. The
+workflow reads ``metadata.json``, ``style.json``, and ``line-items.csv`` from
+the adjacent ``invoice-data`` directory, then writes the generated PDF beside
+this script. Install the Python dependencies with ``pip install requests
+requests-toolbelt`` and run the sample with ``python
+create-invoice-from-structured-data.py``.
+"""
 
 import csv
 import json
