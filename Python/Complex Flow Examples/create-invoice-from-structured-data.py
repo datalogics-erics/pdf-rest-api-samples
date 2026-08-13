@@ -285,7 +285,7 @@ def build_table(metadata, style, line_items, subtotal, tax, total):
     return {
         "page": 1,
         "x": 54,
-            "y": 510,
+        "y": 510,
         "width": TABLE_WIDTH,
         "columns": [{"width": width} for width in TABLE_COLUMN_WIDTHS],
         "continuation_page_top_margin": 85,
