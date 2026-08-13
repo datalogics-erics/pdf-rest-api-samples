@@ -125,6 +125,7 @@ static void PrintUsage()
     Console.Error.WriteLine("  preserve-word-document <office>            Office → PDF → PDF/A-3b");
     Console.Error.WriteLine("  protected-watermark <pdf>                  Watermark then restrict");
     Console.Error.WriteLine("  redact-preview-and-finalize <pdf>          Preview then apply redactions\n");
+    Console.Error.WriteLine("  create-invoice-from-structured-data         Generate invoice from JSON and CSV\n");
 
     Console.Error.WriteLine("Environment (.env supported):");
     Console.Error.WriteLine("  PDFREST_API_KEY=...    Required API key");
@@ -217,6 +218,9 @@ switch (cmd)
         break;
     case "redact-preview-and-finalize":
         await Samples.ComplexFlowExamples.RedactPreviewAndFinalize.Execute(rest);
+        break;
+    case "create-invoice-from-structured-data":
+        await Samples.ComplexFlowExamples.CreateInvoiceFromStructuredData.Execute(rest);
         break;
     case "extracted-text":
         await Samples.EndpointExamples.JsonPayload.ExtractedText.Execute(rest);
