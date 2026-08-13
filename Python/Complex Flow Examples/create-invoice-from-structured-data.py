@@ -147,10 +147,10 @@ def build_footer_text_objects(metadata, style, page_count):
     muted = rgb_string(style["mutedTextColorRgb"])
     text = []
     final_page = str(page_count)
-    add_text_object(text, style, final_page, 66, 136, "Payment terms", 8, primary, 480, "H2", True)
-    add_text_object(text, style, final_page, 66, 122, metadata["paymentTerms"], 7.5, muted, 480)
-    add_text_object(text, style, final_page, 66, 92, "Notes", 8, primary, 480, "H2", True)
-    add_text_object(text, style, final_page, 66, 78, metadata["notes"], 7.5, muted, 480)
+    add_text_object(text, style, final_page, 66, 156, "Payment terms", 8, primary, 480, "H2", True)
+    add_text_object(text, style, final_page, 66, 142, metadata["paymentTerms"], 7.5, muted, 480)
+    add_text_object(text, style, final_page, 66, 112, "Notes", 8, primary, 480, "H2", True)
+    add_text_object(text, style, final_page, 66, 98, metadata["notes"], 7.5, muted, 480)
 
     for page in range(1, page_count + 1):
         footer_y = 54
