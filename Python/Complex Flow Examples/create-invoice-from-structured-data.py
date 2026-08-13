@@ -153,12 +153,13 @@ def build_footer_text_objects(metadata, style, page_count):
     add_text_object(text, style, final_page, 66, 78, metadata["notes"], 7.5, muted, 480)
 
     for page in range(1, page_count + 1):
+        footer_y = 24 if page == page_count else 54
         add_text_object(
             text,
             style,
             str(page),
             54,
-            24,
+            footer_y,
             "Generated from structured JSON and CSV input with pdfRest.",
             7.5,
             muted,
@@ -169,7 +170,7 @@ def build_footer_text_objects(metadata, style, page_count):
             style,
             str(page),
             490,
-            24,
+            footer_y,
             f"Page {page} of {page_count}",
             7.5,
             muted,
@@ -287,7 +288,7 @@ def build_table(metadata, style, line_items, subtotal, tax, total):
         "width": TABLE_WIDTH,
         "columns": [{"width": width} for width in TABLE_COLUMN_WIDTHS],
         "continuation_page_top_margin": 85,
-        "page_bottom_margin": 48,
+        "page_bottom_margin": 96,
         "final_page_bottom_margin": 164,
         "overflow_behavior": "split-row",
         "row_split_behavior": "prefer-next-page",
