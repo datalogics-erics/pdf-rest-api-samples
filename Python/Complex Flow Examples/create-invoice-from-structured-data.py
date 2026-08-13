@@ -116,24 +116,22 @@ def build_header_text_objects(metadata, style):
         )
 
     add("1", 405, 724, "INVOICE", 22, primary, 153, "H1", True)
-    add("1", 54, 700, seller["taxId"], 8, muted, 250)
-    add("1", 54, 686, seller["addressLine1"], 9, muted, 250)
-    add("1", 54, 674, f'{seller["city"]}, {seller["region"]} {seller["postalCode"]}', 9, muted, 250)
     add("1", 405, 696, f'Invoice {metadata["invoiceNumber"]}', 9, muted, 153, bold=True)
     add("1", 405, 682, f'Issued {metadata["issueDate"]}', 9, muted, 153)
     add("1", 405, 668, f'Due {metadata["dueDate"]}', 9, muted, 153)
 
-    add("1", 66, 632, "FROM", 8, primary, 216, "H2", True)
-    add("1", 66, 616, seller["name"], 9, "34,34,34", 216, bold=True)
-    add("1", 66, 602, seller["addressLine1"], 8, muted, 216)
-    add("1", 66, 590, f'{seller["city"]}, {seller["region"]} {seller["postalCode"]}', 8, muted, 216)
-    add("1", 330, 632, "BILL TO", 8, primary, 216, "H2", True)
-    add("1", 330, 616, customer["name"], 9, "34,34,34", 216, bold=True)
-    add("1", 330, 602, customer["addressLine1"], 8, muted, 216)
+    add("1", 66, 642, "FROM", 8, primary, 216, "H2", True)
+    add("1", 66, 626, seller["name"], 9, "34,34,34", 216, bold=True)
+    add("1", 66, 612, seller["taxId"], 8, muted, 216)
+    add("1", 66, 598, seller["addressLine1"], 8, muted, 216)
+    add("1", 66, 586, f'{seller["city"]}, {seller["region"]} {seller["postalCode"]}', 8, muted, 216)
+    add("1", 330, 642, "BILL TO", 8, primary, 216, "H2", True)
+    add("1", 330, 626, customer["name"], 9, "34,34,34", 216, bold=True)
+    add("1", 330, 612, customer["addressLine1"], 8, muted, 216)
     add(
         "1",
         330,
-        590,
+        598,
         f'{customer["city"]}, {customer["region"]} {customer["postalCode"]}',
         8,
         muted,
@@ -316,9 +314,9 @@ def build_header_shape_objects(style):
             "type": "rectangle",
             "page": 1,
             "x": 54,
-            "y": 574,
+            "y": 560,
             "width": 240,
-            "height": 78,
+            "height": 96,
             "fill_color_rgb": rgb_string(style["accentColorRgb"]),
             "stroke_color_rgb": border_color,
             "stroke_width": 0.5,
@@ -328,9 +326,9 @@ def build_header_shape_objects(style):
             "type": "rectangle",
             "page": 1,
             "x": 318,
-            "y": 574,
+            "y": 560,
             "width": 240,
-            "height": 78,
+            "height": 96,
             "fill_color_rgb": rgb_string(style["accentColorRgb"]),
             "stroke_color_rgb": border_color,
             "stroke_width": 0.5,
