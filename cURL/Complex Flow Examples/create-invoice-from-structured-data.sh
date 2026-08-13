@@ -62,9 +62,14 @@ TABLE_OBJECTS=$(jq -n --argjson metadata "$METADATA" --argjson style "$STYLE" --
 CURRENT=$(post_multipart pdf-with-added-tables -F "id=$CURRENT_ID" -F "table_objects=$TABLE_OBJECTS" -F 'tag_enabled=true' -F 'tag_language=en-US')
 CURRENT_ID=$(printf '%s' "$CURRENT" | jq -r '.outputId')
 
-CURRENT=$(post_multipart pdf-with-added-image -F "id=$CURRENT_ID" \
-  -F 'image_objects={"image_index":0,"page":1,"x":54,"y":716,"width":200,"tag_alt_text":"Northstar Sample Supply logo","tag_structure_type":"Figure"}' \
-  -F "image_files=@$DATA_DIR/northstar-logo.png" -F 'tag_enabled=true' -F 'tag_language=en-US')
+LOGO_ID=$(curl --fail-with-body --silent --show-error --location "$API_URL/upload" \
+  --header "Api-Key: $API_KEY" --header 'Content-Filename: northstar-logo.png' \
+  --header 'Content-Type: application/octet-stream' --data-binary "@$DATA_DIR/northstar-logo.png" \
+  | jq -r '.files[0].id')
+CURRENT=$(post_multipart pdf-with-added-image -F "id=$CURRENT_ID" -F "image_id=$LOGO_ID" \
+  -F 'page=1' -F 'x=54' -F 'y=716' -F 'width=200' \
+  -F 'tag_alt_text=Northstar Sample Supply logo' -F 'tag_structure_type=Figure' \
+  -F 'tag_enabled=true' -F 'tag_language=en-US')
 CURRENT_ID=$(printf '%s' "$CURRENT" | jq -r '.outputId')
 PAGE_COUNT=$(post_multipart pdf-info -F "id=$CURRENT_ID" -F 'queries=page_count' | jq -r '.page_count')
 

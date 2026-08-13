@@ -376,6 +376,24 @@ def download_output(output_id):
     OUTPUT_PATH.write_bytes(response.content)
 
 
+def upload_image(path):
+    """Upload the logo and return its pdfRest resource ID."""
+    with open(path, "rb") as image_file:
+        response = requests.post(
+            f"{API_URL}/upload",
+            data=image_file,
+            headers={
+                "Accept": "application/json",
+                "Api-Key": API_KEY,
+                "Content-Filename": path.name,
+                "Content-Type": "application/octet-stream",
+            },
+            timeout=120,
+        )
+    response.raise_for_status()
+    return response.json()["files"][0]["id"]
+
+
 def main():
     """Run the complete invoice-generation workflow."""
     metadata, style, line_items = load_inputs()
@@ -431,27 +449,22 @@ def main():
     current_id = table_result["outputId"]
 
     logo_path = DATA_DIR / "northstar-logo.png"
-    with open(logo_path, "rb") as logo_file:
-        image_result = post_multipart(
-            "pdf-with-added-image",
-            {
-                "id": current_id,
-                "image_objects": json.dumps(
-                    {
-                        "image_index": 0,
-                        "page": 1,
-                        "x": 54,
-                        "y": 716,
-                        "width": 200,
-                        "tag_alt_text": "Northstar Sample Supply logo",
-                        "tag_structure_type": "Figure",
-                    }
-                ),
-                "image_files": (logo_path.name, logo_file, "image/png"),
-                "tag_enabled": "true",
-                "tag_language": "en-US",
-            },
-        )
+    logo_id = upload_image(logo_path)
+    image_result = post_multipart(
+        "pdf-with-added-image",
+        {
+            "id": current_id,
+            "image_id": logo_id,
+            "page": "1",
+            "x": "54",
+            "y": "716",
+            "width": "200",
+            "tag_alt_text": "Northstar Sample Supply logo",
+            "tag_structure_type": "Figure",
+            "tag_enabled": "true",
+            "tag_language": "en-US",
+        },
+    )
     current_id = image_result["outputId"]
 
     info_result = post_multipart("pdf-info", {"id": current_id, "queries": "page_count"})

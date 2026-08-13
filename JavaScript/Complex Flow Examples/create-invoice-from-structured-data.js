@@ -54,6 +54,13 @@ async function postMultipart(endpoint, fields) {
   return response.data;
 }
 
+async function uploadFile(filePath) {
+  const response = await axios.post(`${apiUrl}/upload`, fs.createReadStream(filePath), {
+    headers: { "Api-Key": apiKey, "Content-Filename": path.basename(filePath), "Content-Type": "application/octet-stream" },
+  });
+  return response.data.files[0].id;
+}
+
 function textObjects(metadata, style) {
   const seller = metadata.seller;
   const customer = metadata.customer;
@@ -122,7 +129,8 @@ async function main() {
   currentId = (await postMultipart("pdf-with-added-text", { id: currentId, text_objects: JSON.stringify(textObjects(metadata, style)), tag_enabled: true, tag_language: "en-US" })).outputId;
   currentId = (await postMultipart("pdf-with-added-tables", { id: currentId, table_objects: JSON.stringify(tableObjects(metadata, style, items)), tag_enabled: true, tag_language: "en-US" })).outputId;
   const logoPath = path.join(dataDir, "northstar-logo.png");
-  currentId = (await postMultipart("pdf-with-added-image", { id: currentId, image_objects: JSON.stringify({ image_index: 0, page: 1, x: 54, y: 716, width: 200, tag_alt_text: "Northstar Sample Supply logo", tag_structure_type: "Figure" }), image_files: { path: logoPath, name: "northstar-logo.png" }, tag_enabled: true, tag_language: "en-US" })).outputId;
+  const logoId = await uploadFile(logoPath);
+  currentId = (await postMultipart("pdf-with-added-image", { id: currentId, image_id: logoId, page: 1, x: 54, y: 716, width: 200, tag_alt_text: "Northstar Sample Supply logo", tag_structure_type: "Figure", tag_enabled: true, tag_language: "en-US" })).outputId;
   const pageCount = Number((await postMultipart("pdf-info", { id: currentId, queries: "page_count" })).page_count);
   currentId = (await postMultipart("pdf-with-added-shapes", { id: currentId, shape_objects: JSON.stringify(shapeObjects(style, pageCount, true)), tag_enabled: true })).outputId;
   const footer = [];

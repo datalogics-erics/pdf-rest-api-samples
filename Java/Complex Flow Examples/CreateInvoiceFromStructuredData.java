@@ -51,6 +51,13 @@ public class CreateInvoiceFromStructuredData {
     try (Response response = CLIENT.newCall(request).execute()) { return result(response, endpoint); }
   }
 
+  private static String uploadImage(String baseUrl, String key, Path image) throws IOException {
+    Request request = new Request.Builder().url(baseUrl + "/upload").header("Api-Key", key)
+        .header("Content-Filename", image.getFileName().toString()).header("Content-Type", "application/octet-stream")
+        .post(RequestBody.create(image.toFile(), MediaType.parse("application/octet-stream"))).build();
+    try (Response response = CLIENT.newCall(request).execute()) { return result(response, "upload").getJSONArray("files").getJSONObject(0).getString("id"); }
+  }
+
   private static JSONObject result(Response response, String endpoint) throws IOException {
     String text = response.body() == null ? "" : response.body().string();
     System.out.println(endpoint + ": " + response.code());
@@ -115,7 +122,8 @@ public class CreateInvoiceFromStructuredData {
     id = postMultipart(apiUrl, apiKey, "pdf-with-added-shapes", List.of(Part.value("id", id), Part.value("shape_objects", shapes(style, 1, false).toString()), Part.value("tag_enabled", "true"))).getString("outputId");
     id = postMultipart(apiUrl, apiKey, "pdf-with-added-text", List.of(Part.value("id", id), Part.value("text_objects", textObjects(metadata, style).toString()), Part.value("tag_enabled", "true"), Part.value("tag_language", "en-US"))).getString("outputId");
     id = postMultipart(apiUrl, apiKey, "pdf-with-added-tables", List.of(Part.value("id", id), Part.value("table_objects", tableObjects(metadata, style, items).toString()), Part.value("tag_enabled", "true"), Part.value("tag_language", "en-US"))).getString("outputId");
-    id = postMultipart(apiUrl, apiKey, "pdf-with-added-image", List.of(Part.value("id", id), Part.value("image_objects", new JSONObject().put("image_index", 0).put("page", 1).put("x", 54).put("y", 716).put("width", 200).put("tag_alt_text", "Northstar Sample Supply logo").put("tag_structure_type", "Figure").toString()), Part.file("image_files", DATA_DIR.resolve("northstar-logo.png")), Part.value("tag_enabled", "true"), Part.value("tag_language", "en-US"))).getString("outputId");
+    String logoId = uploadImage(apiUrl, apiKey, DATA_DIR.resolve("northstar-logo.png"));
+    id = postMultipart(apiUrl, apiKey, "pdf-with-added-image", List.of(Part.value("id", id), Part.value("image_id", logoId), Part.value("page", "1"), Part.value("x", "54"), Part.value("y", "716"), Part.value("width", "200"), Part.value("tag_alt_text", "Northstar Sample Supply logo"), Part.value("tag_structure_type", "Figure"), Part.value("tag_enabled", "true"), Part.value("tag_language", "en-US"))).getString("outputId");
     int pageCount = postMultipart(apiUrl, apiKey, "pdf-info", List.of(Part.value("id", id), Part.value("queries", "page_count"))).getInt("page_count");
     id = postMultipart(apiUrl, apiKey, "pdf-with-added-shapes", List.of(Part.value("id", id), Part.value("shape_objects", shapes(style, pageCount, true).toString()), Part.value("tag_enabled", "true"))).getString("outputId");
     JSONArray footer = new JSONArray(); addText(footer, style, pageCount, 66, 156, "Payment terms", 8, rgb(style.getJSONArray("mutedTextColorRgb")), 480, "H2", true); addText(footer, style, pageCount, 66, 142, metadata.getString("paymentTerms"), 7.5, rgb(style.getJSONArray("mutedTextColorRgb")), 480, "P", false); addText(footer, style, pageCount, 66, 112, "Notes", 8, rgb(style.getJSONArray("mutedTextColorRgb")), 480, "H2", true); addText(footer, style, pageCount, 66, 98, metadata.getString("notes"), 7.5, rgb(style.getJSONArray("mutedTextColorRgb")), 480, "P", false);

@@ -45,6 +45,13 @@ function postMultipart(Client $client, string $url, string $apiKey, array $field
     return json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
 }
 
+function uploadFile(Client $client, string $url, string $apiKey, string $path): string
+{
+    $response = $client->send(new Request('POST', $url . '/upload', ['Accept' => 'application/json', 'Api-Key' => $apiKey, 'Content-Filename' => basename($path), 'Content-Type' => 'application/octet-stream'], Utils::tryFopen($path, 'r')));
+    $result = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+    return $result['files'][0]['id'];
+}
+
 function textObjects(array $metadata, array $style): array
 {
     $seller = $metadata['seller']; $customer = $metadata['customer']; $objects = [];
@@ -93,7 +100,8 @@ $currentId = $blank['outputId'];
 $currentId = postMultipart($client, $apiUrl . '/pdf-with-added-shapes', $apiKey, ['id' => $currentId, 'shape_objects' => json_encode(shapes($style, 1)), 'tag_enabled' => 'true'])['outputId'];
 $currentId = postMultipart($client, $apiUrl . '/pdf-with-added-text', $apiKey, ['id' => $currentId, 'text_objects' => json_encode(textObjects($metadata, $style)), 'tag_enabled' => 'true', 'tag_language' => 'en-US'])['outputId'];
 $currentId = postMultipart($client, $apiUrl . '/pdf-with-added-tables', $apiKey, ['id' => $currentId, 'table_objects' => json_encode(tableObjects($metadata, $style, $items)), 'tag_enabled' => 'true', 'tag_language' => 'en-US'])['outputId'];
-$currentId = postMultipart($client, $apiUrl . '/pdf-with-added-image', $apiKey, ['id' => $currentId, 'image_objects' => json_encode(['image_index' => 0, 'page' => 1, 'x' => 54, 'y' => 716, 'width' => 200, 'tag_alt_text' => 'Northstar Sample Supply logo', 'tag_structure_type' => 'Figure']), 'image_files' => ['path' => $dataDir . '/northstar-logo.png', 'name' => 'northstar-logo.png'], 'tag_enabled' => 'true', 'tag_language' => 'en-US'])['outputId'];
+$logoId = uploadFile($client, $apiUrl, $apiKey, $dataDir . '/northstar-logo.png');
+$currentId = postMultipart($client, $apiUrl . '/pdf-with-added-image', $apiKey, ['id' => $currentId, 'image_id' => $logoId, 'page' => '1', 'x' => '54', 'y' => '716', 'width' => '200', 'tag_alt_text' => 'Northstar Sample Supply logo', 'tag_structure_type' => 'Figure', 'tag_enabled' => 'true', 'tag_language' => 'en-US'])['outputId'];
 $pageCount = (int)postMultipart($client, $apiUrl . '/pdf-info', $apiKey, ['id' => $currentId, 'queries' => 'page_count'])['page_count'];
 $currentId = postMultipart($client, $apiUrl . '/pdf-with-added-shapes', $apiKey, ['id' => $currentId, 'shape_objects' => json_encode(shapes($style, $pageCount, true)), 'tag_enabled' => 'true'])['outputId'];
 $footer = [];

@@ -34,7 +34,8 @@ public static class CreateInvoiceFromStructuredData
         id = (string)(await PostMultipart(client, apiKey, "pdf-with-added-text", new Dictionary<string, object?> { ["id"] = id, ["text_objects"] = TextObjects(metadata, style), ["tag_enabled"] = "true", ["tag_language"] = "en-US" }))!["outputId"]!;
         id = (string)(await PostMultipart(client, apiKey, "pdf-with-added-tables", new Dictionary<string, object?> { ["id"] = id, ["table_objects"] = Tables(metadata, style, items), ["tag_enabled"] = "true", ["tag_language"] = "en-US" }))!["outputId"]!;
         var imagePath = Path.Combine(DataDirectory, "northstar-logo.png");
-        id = (string)(await PostMultipart(client, apiKey, "pdf-with-added-image", new Dictionary<string, object?> { ["id"] = id, ["image_objects"] = JObject.FromObject(new { image_index = 0, page = 1, x = 54, y = 716, width = 200, tag_alt_text = "Northstar Sample Supply logo", tag_structure_type = "Figure" }), ["image_files"] = imagePath, ["tag_enabled"] = "true", ["tag_language"] = "en-US" }))!["outputId"]!;
+        var logoId = await UploadImage(client, apiKey, imagePath);
+        id = (string)(await PostMultipart(client, apiKey, "pdf-with-added-image", new Dictionary<string, object?> { ["id"] = id, ["image_id"] = logoId, ["page"] = 1, ["x"] = 54, ["y"] = 716, ["width"] = 200, ["tag_alt_text"] = "Northstar Sample Supply logo", ["tag_structure_type"] = "Figure", ["tag_enabled"] = "true", ["tag_language"] = "en-US" }))!["outputId"]!;
         var info = await PostMultipart(client, apiKey, "pdf-info", new Dictionary<string, object?> { ["id"] = id, ["queries"] = "page_count" });
         var pageCount = info!["page_count"]!.Value<int>();
         id = (string)(await PostMultipart(client, apiKey, "pdf-with-added-shapes", new Dictionary<string, object?> { ["id"] = id, ["shape_objects"] = Shapes(style, pageCount, true), ["tag_enabled"] = "true" }))!["outputId"]!;
@@ -42,6 +43,17 @@ public static class CreateInvoiceFromStructuredData
         var output = await client.GetByteArrayAsync($"resource/{id}?format=file");
         await File.WriteAllBytesAsync(OutputPath, output);
         Console.WriteLine($"Created {Path.GetFullPath(OutputPath)}");
+    }
+
+    private static async Task<string> UploadImage(HttpClient client, string apiKey, string path)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Post, "upload");
+        request.Headers.Add("Api-Key", apiKey);
+        request.Headers.Add("Content-Filename", Path.GetFileName(path));
+        request.Content = new ByteArrayContent(await File.ReadAllBytesAsync(path));
+        request.Content.Headers.ContentType = new("application/octet-stream");
+        var result = await Send(client, request, "upload");
+        return (string)result["files"]![0]!["id"]!;
     }
 
     private static async Task<JObject> PostJson(HttpClient client, string key, string endpoint, JObject payload)
