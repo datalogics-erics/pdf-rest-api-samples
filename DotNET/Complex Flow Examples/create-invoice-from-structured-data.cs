@@ -24,7 +24,7 @@ public static class CreateInvoiceFromStructuredData
         var apiKey = Environment.GetEnvironmentVariable("PDFREST_API_KEY");
         if (string.IsNullOrWhiteSpace(apiKey)) { Console.Error.WriteLine("Missing required environment variable: PDFREST_API_KEY"); return; }
         var baseUrl = (Environment.GetEnvironmentVariable("PDFREST_URL") ?? "https://api.pdfrest.com").TrimEnd('/');
-        using var client = new HttpClient { BaseAddress = new Uri(baseUrl) };
+        using var client = new HttpClient(new HttpClientHandler { UseCookies = false }) { BaseAddress = new Uri(baseUrl) };
         var metadata = JObject.Parse(await File.ReadAllTextAsync(Path.Combine(DataDirectory, "metadata.json")));
         var style = JObject.Parse(await File.ReadAllTextAsync(Path.Combine(DataDirectory, "style.json")));
         var items = ReadCsv(Path.Combine(DataDirectory, "line-items.csv"));
