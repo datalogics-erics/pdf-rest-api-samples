@@ -153,7 +153,7 @@ def build_footer_text_objects(metadata, style, page_count):
     add_text_object(text, style, final_page, 66, 78, metadata["notes"], 7.5, muted, 480)
 
     for page in range(1, page_count + 1):
-        footer_y = 24 if page == page_count else 54
+        footer_y = 54
         add_text_object(
             text,
             style,
@@ -346,7 +346,7 @@ def build_footer_shape_objects(style, page_count):
             "type": "rectangle",
             "page": page_count,
             "x": 54,
-            "y": 48,
+            "y": 70,
             "width": 504,
             "height": 104,
             "fill_color_rgb": "248,250,251",
