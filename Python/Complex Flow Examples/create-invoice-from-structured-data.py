@@ -120,18 +120,18 @@ def build_header_text_objects(metadata, style):
     add("1", 405, 682, f'Issued {metadata["issueDate"]}', 9, muted, 153)
     add("1", 405, 668, f'Due {metadata["dueDate"]}', 9, muted, 153)
 
-    add("1", 66, 642, "FROM", 8, primary, 216, "H2", True)
-    add("1", 66, 626, seller["name"], 9, "34,34,34", 216, bold=True)
-    add("1", 66, 612, seller["taxId"], 8, muted, 216)
-    add("1", 66, 598, seller["addressLine1"], 8, muted, 216)
-    add("1", 66, 586, f'{seller["city"]}, {seller["region"]} {seller["postalCode"]}', 8, muted, 216)
-    add("1", 330, 642, "BILL TO", 8, primary, 216, "H2", True)
-    add("1", 330, 626, customer["name"], 9, "34,34,34", 216, bold=True)
-    add("1", 330, 612, customer["addressLine1"], 8, muted, 216)
+    add("1", 66, 622, "FROM", 8, primary, 216, "H2", True)
+    add("1", 66, 606, seller["name"], 9, "34,34,34", 216, bold=True)
+    add("1", 66, 592, seller["taxId"], 8, muted, 216)
+    add("1", 66, 578, seller["addressLine1"], 8, muted, 216)
+    add("1", 66, 566, f'{seller["city"]}, {seller["region"]} {seller["postalCode"]}', 8, muted, 216)
+    add("1", 330, 622, "BILL TO", 8, primary, 216, "H2", True)
+    add("1", 330, 606, customer["name"], 9, "34,34,34", 216, bold=True)
+    add("1", 330, 592, customer["addressLine1"], 8, muted, 216)
     add(
         "1",
         330,
-        598,
+        578,
         f'{customer["city"]}, {customer["region"]} {customer["postalCode"]}',
         8,
         muted,
@@ -314,7 +314,7 @@ def build_header_shape_objects(style):
             "type": "rectangle",
             "page": 1,
             "x": 54,
-            "y": 560,
+            "y": 540,
             "width": 240,
             "height": 96,
             "fill_color_rgb": rgb_string(style["accentColorRgb"]),
@@ -326,7 +326,7 @@ def build_header_shape_objects(style):
             "type": "rectangle",
             "page": 1,
             "x": 318,
-            "y": 560,
+            "y": 540,
             "width": 240,
             "height": 96,
             "fill_color_rgb": rgb_string(style["accentColorRgb"]),
