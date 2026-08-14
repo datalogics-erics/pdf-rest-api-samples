@@ -18,6 +18,7 @@ use GuzzleHttp\Psr7\Utils;
 
 $apiUrl = rtrim(getenv('PDFREST_URL') ?: 'https://api.pdfrest.com', '/');
 $apiKey = getenv('PDFREST_API_KEY') ?: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx';
+// Keep the JSON, CSV, and logo fixtures beside this sample so it can run independently.
 $dataDir = __DIR__ . '/invoice-data';
 $outputPath = __DIR__ . '/invoice-from-structured-data.pdf';
 $client = new Client(['http_errors' => true]);
@@ -89,25 +90,31 @@ function shapes(array $style, int $page, bool $footer = false): array
     return [['type' => 'rectangle', 'page' => 1, 'x' => 54, 'y' => 540, 'width' => 240, 'height' => 96, 'fill_color_rgb' => rgb($style['accentColorRgb'])] + $border, ['type' => 'rectangle', 'page' => 1, 'x' => 318, 'y' => 540, 'width' => 240, 'height' => 96, 'fill_color_rgb' => rgb($style['accentColorRgb'])] + $border];
 }
 
+// Load the bundled invoice metadata, style settings, and variable line items.
 $metadata = json_decode(file_get_contents($dataDir . '/metadata.json'), true, 512, JSON_THROW_ON_ERROR);
 $style = json_decode(file_get_contents($dataDir . '/style.json'), true, 512, JSON_THROW_ON_ERROR);
 $handle = fopen($dataDir . '/line-items.csv', 'r'); $headers = fgetcsv($handle, 0, ',', '"', ''); $items = [];
 while (($row = fgetcsv($handle, 0, ',', '"', '')) !== false) if (count($row) >= count($headers)) $items[] = array_combine($headers, $row);
 fclose($handle);
 
+// Start with a blank page, then add the header panels and tagged header text.
 $blank = postJson($client, $apiUrl . '/blank-pdf', $apiKey, ['page_size' => 'letter', 'page_count' => 1, 'page_orientation' => 'portrait']);
 $currentId = $blank['outputId'];
 $currentId = postMultipart($client, $apiUrl . '/pdf-with-added-shapes', $apiKey, ['id' => $currentId, 'shape_objects' => json_encode(shapes($style, 1)), 'tag_enabled' => 'true'])['outputId'];
 $currentId = postMultipart($client, $apiUrl . '/pdf-with-added-text', $apiKey, ['id' => $currentId, 'text_objects' => json_encode(textObjects($metadata, $style)), 'tag_enabled' => 'true', 'tag_language' => 'en-US'])['outputId'];
+// Insert the data-driven table; the table endpoint handles row layout and overflow.
 $currentId = postMultipart($client, $apiUrl . '/pdf-with-added-tables', $apiKey, ['id' => $currentId, 'table_objects' => json_encode(tableObjects($metadata, $style, $items)), 'tag_enabled' => 'true', 'tag_language' => 'en-US'])['outputId'];
+// Upload the logo once, then reuse its resource ID when placing the image.
 $logoId = uploadFile($client, $apiUrl, $apiKey, $dataDir . '/northstar-logo.png');
 $currentId = postMultipart($client, $apiUrl . '/pdf-with-added-image', $apiKey, ['id' => $currentId, 'image_id' => $logoId, 'page' => '1', 'x' => '54', 'y' => '716', 'width' => '200', 'tag_alt_text' => 'Northstar Sample Supply logo', 'tag_structure_type' => 'Figure', 'tag_enabled' => 'true', 'tag_language' => 'en-US'])['outputId'];
+// Query the final page count before adding the last-page panel and running footers.
 $pageCount = (int)postMultipart($client, $apiUrl . '/pdf-info', $apiKey, ['id' => $currentId, 'queries' => 'page_count'])['page_count'];
 $currentId = postMultipart($client, $apiUrl . '/pdf-with-added-shapes', $apiKey, ['id' => $currentId, 'shape_objects' => json_encode(shapes($style, $pageCount, true)), 'tag_enabled' => 'true'])['outputId'];
 $footer = [];
 $addFooter = function (string $text, int $page, int $x, int $y, float $size, int $width, string $structure = 'P', bool $bold = false) use (&$footer, $style): void { $footer[] = ['font' => $bold ? $style['boldFont'] : $style['bodyFont'], 'max_width' => $width, 'opacity' => '1', 'page' => (string)$page, 'rotation' => '0', 'text' => $text, 'text_color_rgb' => rgb($style['mutedTextColorRgb']), 'text_size' => $size, 'x' => $x, 'y' => $y, 'tag_structure_type' => $structure]; };
 $addFooter('Payment terms', $pageCount, 66, 156, 8, 480, 'H2', true); $addFooter($metadata['paymentTerms'], $pageCount, 66, 142, 7.5, 480); $addFooter('Notes', $pageCount, 66, 112, 8, 480, 'H2', true); $addFooter($metadata['notes'], $pageCount, 66, 98, 7.5, 480);
 for ($page = 1; $page <= $pageCount; $page++) { $addFooter('Generated from structured JSON and CSV input with pdfRest.', $page, 54, 54, 7.5, 400); $addFooter("Page $page of $pageCount", $page, 490, 54, 7.5, 68); }
+// Add the final-page content and shared page footers, then download the result.
 $final = postMultipart($client, $apiUrl . '/pdf-with-added-text', $apiKey, ['id' => $currentId, 'text_objects' => json_encode($footer), 'tag_enabled' => 'true', 'tag_language' => 'en-US', 'output' => 'invoice_from_structured_data']);
 $pdf = $client->get($apiUrl . '/resource/' . rawurlencode($final['outputId']) . '?format=file', ['headers' => ['Api-Key' => $apiKey]]);
 file_put_contents($outputPath, $pdf->getBody()->getContents());

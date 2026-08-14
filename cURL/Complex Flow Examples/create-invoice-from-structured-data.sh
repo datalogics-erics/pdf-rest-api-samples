@@ -10,6 +10,7 @@
 set -eu
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+# Keep the JSON, CSV, and logo fixtures beside this sample so it can run independently.
 DATA_DIR="$SCRIPT_DIR/invoice-data"
 OUTPUT_PATH="$SCRIPT_DIR/invoice-from-structured-data.pdf"
 API_URL="${PDFREST_URL:-https://api.pdfrest.com}"

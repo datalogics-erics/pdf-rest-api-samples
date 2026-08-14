@@ -21,6 +21,7 @@ from requests_toolbelt import MultipartEncoder
 # each response ID to the next pdfRest endpoint.
 API_URL = os.getenv("PDFREST_URL", "https://api.pdfrest.com").rstrip("/")
 API_KEY = os.getenv("PDFREST_API_KEY", "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
+# Keep the JSON, CSV, and logo fixtures beside this sample so it can run independently.
 DATA_DIR = Path(__file__).with_name("invoice-data")
 OUTPUT_PATH = Path(__file__).with_name("invoice-from-structured-data.pdf")
 

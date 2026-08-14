@@ -13,6 +13,7 @@ const path = require("path");
 
 const apiUrl = (process.env.PDFREST_URL || "https://api.pdfrest.com").replace(/\/$/, "");
 const apiKey = process.env.PDFREST_API_KEY || "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
+// Keep the JSON, CSV, and logo fixtures beside this sample so it can run independently.
 const dataDir = path.join(__dirname, "invoice-data");
 const outputPath = path.join(__dirname, "invoice-from-structured-data.pdf");
 const tableWidths = [276, 54, 84, 90];

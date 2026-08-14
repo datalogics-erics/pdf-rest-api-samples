@@ -16,26 +16,36 @@ namespace Samples.ComplexFlowExamples;
 
 public static class CreateInvoiceFromStructuredData
 {
+    // Keep the JSON, CSV, and logo fixtures beside this sample so it can run independently.
     private static readonly string DataDirectory = Path.Combine("Complex Flow Examples", "invoice-data");
     private static readonly string OutputPath = Path.Combine("Complex Flow Examples", "invoice-from-structured-data.pdf");
 
     public static async Task Execute(string[] args)
     {
         var apiKey = Environment.GetEnvironmentVariable("PDFREST_API_KEY");
-        if (string.IsNullOrWhiteSpace(apiKey)) { Console.Error.WriteLine("Missing required environment variable: PDFREST_API_KEY"); return; }
+        if (string.IsNullOrWhiteSpace(apiKey)) { Console.Error.WriteLine("Missing required environment variable: PDFREST_API_KEY"); Environment.Exit(1); return; }
         var baseUrl = (Environment.GetEnvironmentVariable("PDFREST_URL") ?? "https://api.pdfrest.com").TrimEnd('/');
         using var client = new HttpClient(new HttpClientHandler { UseCookies = false }) { BaseAddress = new Uri(baseUrl) };
+
+        // Load the bundled invoice metadata, style settings, and variable line items.
         var metadata = JObject.Parse(await File.ReadAllTextAsync(Path.Combine(DataDirectory, "metadata.json")));
         var style = JObject.Parse(await File.ReadAllTextAsync(Path.Combine(DataDirectory, "style.json")));
         var items = ReadCsv(Path.Combine(DataDirectory, "line-items.csv"));
 
+        // Start with a blank page, then add the header panels and tagged header text.
         var id = (string)(await PostJson(client, apiKey, "blank-pdf", new JObject { ["page_size"] = "letter", ["page_count"] = 1, ["page_orientation"] = "portrait" }))!["outputId"]!;
         id = (string)(await PostMultipart(client, apiKey, "pdf-with-added-shapes", new Dictionary<string, object?> { ["id"] = id, ["shape_objects"] = Shapes(style, 1), ["tag_enabled"] = "true" }))!["outputId"]!;
         id = (string)(await PostMultipart(client, apiKey, "pdf-with-added-text", new Dictionary<string, object?> { ["id"] = id, ["text_objects"] = TextObjects(metadata, style), ["tag_enabled"] = "true", ["tag_language"] = "en-US" }))!["outputId"]!;
+
+        // Insert the data-driven table; the table endpoint handles row layout and overflow.
         id = (string)(await PostMultipart(client, apiKey, "pdf-with-added-tables", new Dictionary<string, object?> { ["id"] = id, ["table_objects"] = Tables(metadata, style, items), ["tag_enabled"] = "true", ["tag_language"] = "en-US" }))!["outputId"]!;
+
+        // Upload the logo once, then reuse its resource ID when placing the image.
         var imagePath = Path.Combine(DataDirectory, "northstar-logo.png");
         var logoId = await UploadImage(client, apiKey, imagePath);
         id = (string)(await PostMultipart(client, apiKey, "pdf-with-added-image", new Dictionary<string, object?> { ["id"] = id, ["image_id"] = logoId, ["page"] = 1, ["x"] = 54, ["y"] = 716, ["width"] = 200, ["tag_alt_text"] = "Northstar Sample Supply logo", ["tag_structure_type"] = "Figure", ["tag_enabled"] = "true", ["tag_language"] = "en-US" }))!["outputId"]!;
+
+        // Query the final page count before adding the last-page panel and running footers.
         var info = await PostMultipart(client, apiKey, "pdf-info", new Dictionary<string, object?> { ["id"] = id, ["queries"] = "page_count" });
         var pageCount = info!["page_count"]!.Value<int>();
         id = (string)(await PostMultipart(client, apiKey, "pdf-with-added-shapes", new Dictionary<string, object?> { ["id"] = id, ["shape_objects"] = Shapes(style, pageCount, true), ["tag_enabled"] = "true" }))!["outputId"]!;

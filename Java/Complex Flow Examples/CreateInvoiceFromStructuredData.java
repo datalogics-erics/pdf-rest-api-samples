@@ -24,6 +24,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class CreateInvoiceFromStructuredData {
+  // Keep the JSON, CSV, and logo fixtures beside this sample so it can run independently.
   private static final Path DATA_DIR = Path.of("invoice-data");
   private static final Path OUTPUT = Path.of("invoice-from-structured-data.pdf");
   private static final String DEFAULT_URL = "https://api.pdfrest.com";
