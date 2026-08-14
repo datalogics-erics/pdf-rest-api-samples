@@ -55,7 +55,9 @@ CURRENT_ID=$(printf '%s' "$CURRENT" | jq -r '.outputId')
 
 TABLE_OBJECTS=$(jq -n --argjson metadata "$METADATA" --argjson style "$STYLE" --argjson items "$ITEMS" '
   def right: {text_align:"right"};
-  def money: "$" + ((. * 100 | round) / 100 | tostring);
+  def comma: if length <= 3 then . else ((.[0:-3] | comma) + "," + .[-3:]) end;
+  def money: (((. * 100 | round) / 100) | tostring) as $value | ($value | split(".")) as $parts |
+    "$" + (($parts[0] | comma) + "." + ((($parts[1] // "") + "00")[0:2]));
   ($style.primaryColorRgb) as $primary | ($style.borderColorRgb) as $border | ($style.accentColorRgb) as $accent |
   ($items | map((.quantity|tonumber) * (.unitPrice|tonumber)) | add) as $subtotal | (($subtotal * $metadata.taxRate * 100 | round) / 100) as $tax | ($subtotal + $tax) as $total |
   (["Description","Qty","Unit Price","Amount"] | to_entries | map(. as $entry |
