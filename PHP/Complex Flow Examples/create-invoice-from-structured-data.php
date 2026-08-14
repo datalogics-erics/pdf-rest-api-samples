@@ -91,8 +91,8 @@ function shapes(array $style, int $page, bool $footer = false): array
 
 $metadata = json_decode(file_get_contents($dataDir . '/metadata.json'), true, 512, JSON_THROW_ON_ERROR);
 $style = json_decode(file_get_contents($dataDir . '/style.json'), true, 512, JSON_THROW_ON_ERROR);
-$handle = fopen($dataDir . '/line-items.csv', 'r'); $headers = fgetcsv($handle); $items = [];
-while (($row = fgetcsv($handle)) !== false) if (count($row) >= count($headers)) $items[] = array_combine($headers, $row);
+$handle = fopen($dataDir . '/line-items.csv', 'r'); $headers = fgetcsv($handle, 0, ',', '"', ''); $items = [];
+while (($row = fgetcsv($handle, 0, ',', '"', '')) !== false) if (count($row) >= count($headers)) $items[] = array_combine($headers, $row);
 fclose($handle);
 
 $blank = postJson($client, $apiUrl . '/blank-pdf', $apiKey, ['page_size' => 'letter', 'page_count' => 1, 'page_orientation' => 'portrait']);
