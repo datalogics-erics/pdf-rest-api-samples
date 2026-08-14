@@ -1,0 +1,10 @@
+{
+  "bodyFont": "helvetica",
+  "boldFont": "helvetica bold",
+  "tableHeaderFontSize": 8.5,
+  "primaryColorRgb": [36, 83, 106],
+  "accentColorRgb": [232, 241, 244],
+  "textColorRgb": [34, 34, 34],
+  "mutedTextColorRgb": [102, 102, 102],
+  "borderColorRgb": [184, 199, 206]
+}
