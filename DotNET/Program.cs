@@ -14,6 +14,7 @@ static void PrintUsage()
     Console.Error.WriteLine("    markdown-json <pdf>                 Convert PDF to Markdown");
     Console.Error.WriteLine("    rasterized-pdf <pdf>               Rasterize PDF pages");
     Console.Error.WriteLine("    pdf <file>                         Convert file to PDF");
+    Console.Error.WriteLine("    pdf-from-markdown|csv|json|xml|text <file>  Structured input to PDF");
     Console.Error.WriteLine("    pdfa <file>                        Convert to PDF/A");
     Console.Error.WriteLine("    pdfx <file>                        Convert to PDF/X");
     Console.Error.WriteLine("    tdm-reserved-pdf <pdf>             Apply TDM rights metadata");
@@ -66,6 +67,7 @@ static void PrintUsage()
     Console.Error.WriteLine("Multipart Payload (multipart/form-data):");
     Console.Error.WriteLine("  Conversions:");
     Console.Error.WriteLine("    pdf-multipart <file>               Convert to PDF");
+    Console.Error.WriteLine("    pdf-from-markdown|csv|json|xml|text-multipart <file>  Structured input to PDF");
     Console.Error.WriteLine("    markdown-multipart <file>          Convert to Markdown");
     Console.Error.WriteLine("    rasterized-pdf-multipart <pdf>     Rasterize PDF");
     Console.Error.WriteLine("    pdfa-multipart <file>              Convert to PDF/A");
@@ -163,6 +165,36 @@ switch (cmd)
         break;
     case "pdf-multipart":
         await Samples.EndpointExamples.MultipartPayload.Pdf.Execute(rest);
+        break;
+    case "pdf-from-markdown":
+        await Samples.EndpointExamples.JsonPayload.PdfFromMarkdown.Execute(rest);
+        break;
+    case "pdf-from-csv":
+        await Samples.EndpointExamples.JsonPayload.PdfFromCsv.Execute(rest);
+        break;
+    case "pdf-from-json":
+        await Samples.EndpointExamples.JsonPayload.PdfFromJson.Execute(rest);
+        break;
+    case "pdf-from-xml":
+        await Samples.EndpointExamples.JsonPayload.PdfFromXml.Execute(rest);
+        break;
+    case "pdf-from-text":
+        await Samples.EndpointExamples.JsonPayload.PdfFromText.Execute(rest);
+        break;
+    case "pdf-from-markdown-multipart":
+        await Samples.EndpointExamples.MultipartPayload.PdfFromMarkdown.Execute(rest);
+        break;
+    case "pdf-from-csv-multipart":
+        await Samples.EndpointExamples.MultipartPayload.PdfFromCsv.Execute(rest);
+        break;
+    case "pdf-from-json-multipart":
+        await Samples.EndpointExamples.MultipartPayload.PdfFromJson.Execute(rest);
+        break;
+    case "pdf-from-xml-multipart":
+        await Samples.EndpointExamples.MultipartPayload.PdfFromXml.Execute(rest);
+        break;
+    case "pdf-from-text-multipart":
+        await Samples.EndpointExamples.MultipartPayload.PdfFromText.Execute(rest);
         break;
     case "markdown-multipart":
         await Samples.EndpointExamples.MultipartPayload.Markdown.Execute(rest);
