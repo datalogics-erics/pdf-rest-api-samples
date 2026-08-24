@@ -12,7 +12,7 @@ var apiUrl = "https://api.pdfrest.com";
 
 // This sample uploads plain text input, then calls /pdf with a JSON payload.
 // It demonstrates structured_text_options and the format-specific conversion options.
-var inputPath = "/path/to/sample.text";
+var inputPath = "/path/to/sample.txt";
 async function upload(path) {
   var response = await axios.post(apiUrl + "/upload", fs.createReadStream(path), { headers: { "Api-Key": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", "Content-Type": "application/octet-stream", "Content-Filename": path.split("/").pop() }, maxBodyLength: Infinity });
   return response.data.files[0].id;
@@ -26,4 +26,3 @@ async function main() {
 }
 
 main().catch((error) => { console.error(error.response ? error.response.data : error.message); process.exitCode = 1; });
-

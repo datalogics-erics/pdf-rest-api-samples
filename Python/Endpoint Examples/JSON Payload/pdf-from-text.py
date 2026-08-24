@@ -11,7 +11,7 @@ api_url = "https://api.pdfrest.com"
 
 # This sample uploads plain text input, then calls /pdf with a JSON payload.
 # It demonstrates structured_text_options and the format-specific conversion options.
-input_path = "/path/to/sample.text"
+input_path = "/path/to/sample.txt"
 
 def upload(path):
     with open(path, "rb") as source:
@@ -113,4 +113,3 @@ if response.ok:
 else:
     print(response.text)
     raise SystemExit(1)
-
