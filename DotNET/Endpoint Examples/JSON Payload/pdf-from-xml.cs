@@ -1,6 +1,6 @@
 /*
  * What this sample does:
- * - Converts structured input to PDF through the /pdf endpoint.
+ * - Converts structured XML input to PDF through the /pdf endpoint.
  *
  * Setup (environment):
  * - Set PDFREST_API_KEY=your_api_key_here
@@ -48,4 +48,3 @@ public static class PdfFromXml
         return JObject.Parse(result)["files"]![0]!["id"]!.Value<string>()!;
     }
 }
-
