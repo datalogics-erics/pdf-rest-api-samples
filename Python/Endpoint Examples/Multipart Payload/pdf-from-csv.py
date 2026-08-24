@@ -1,15 +1,17 @@
 import json
 import os
-import sys
 import requests
 
 # By default, we use the US-based API service. This is the primary endpoint for global use.
-api_url = os.environ.get("PDFREST_URL", "https://api.pdfrest.com")
+api_url = "https://api.pdfrest.com"
+
+# For GDPR compliance and enhanced performance for European users, you can switch to the EU-based service by uncommenting the URL below.
+# For more information visit https://pdfrest.com/pricing#how-do-eu-gdpr-api-calls-work
+#api_url = "https://eu-api.pdfrest.com"
 
 # This sample converts CSV input to a tagged PDF through multipart /pdf.
 # It demonstrates structured_text_options and the format-specific conversion options.
-input_path = sys.argv[1] if len(sys.argv) > 1 else "/path/to/sample.csv"
-api_key = os.environ.get("PDFREST_API_KEY", "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
+input_path = "/path/to/sample.csv"
 options = json.loads(r'''{
   "title": "Structured Content Sample",
   "language": "en-US",
@@ -111,7 +113,7 @@ with open(input_path, "rb") as input_file:
     response = requests.post(api_url + "/pdf", data=form, headers={
         "Accept": "application/json",
         "Content-Type": form.content_type,
-        "Api-Key": api_key,
+        "Api-Key": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
     })
 
 print("Response status code: " + str(response.status_code))
