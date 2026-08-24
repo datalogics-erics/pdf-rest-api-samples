@@ -1,0 +1,132 @@
+import json
+import os
+import sys
+import requests
+
+# By default, we use the US-based API service. This is the primary endpoint for global use.
+api_url = os.environ.get("PDFREST_URL", "https://api.pdfrest.com")
+
+# This sample uploads CSV input, then calls /pdf with a JSON payload.
+# It demonstrates structured_text_options and the format-specific conversion options.
+input_path = sys.argv[1] if len(sys.argv) > 1 else "/path/to/sample.csv"
+api_key = os.environ.get("PDFREST_API_KEY", "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
+
+def upload(path):
+    with open(path, "rb") as source:
+        response = requests.post(api_url + "/upload", data=source, headers={
+            "Content-Type": "application/octet-stream",
+            "Content-Filename": os.path.basename(path),
+            "Api-Key": api_key,
+        })
+    if not response.ok:
+        print(response.text)
+        raise SystemExit(1)
+    return response.json()["files"][0]["id"]
+
+input_id = upload(input_path)
+payload = {
+    "id": input_id,
+    "structured_text_options": json.loads(r'''{
+  "title": "Structured Content Sample",
+  "language": "en-US",
+  "enable_tagging": true,
+  "page_setup": {
+    "size": "Letter",
+    "orientation": "portrait",
+    "margin": {
+      "top": 36,
+      "right": 42,
+      "bottom": 36,
+      "left": 42
+    }
+  },
+  "style": {
+    "font": "Arial",
+    "heading_font": "Arial",
+    "code_font": "Courier",
+    "text_size": 11,
+    "text_color_rgb": [
+      34,
+      34,
+      34
+    ],
+    "heading_scale": 1.35,
+    "table": {
+      "column_width_weights": [
+        2,
+        3,
+        2
+      ],
+      "keep_header_with_first_row": true,
+      "repeat_headers_on_overflow": true,
+      "show_borders": true,
+      "border_width": 0.75,
+      "border_color_rgb": [
+        180,
+        188,
+        200
+      ],
+      "header_fill_color_rgb": [
+        33,
+        64,
+        98
+      ],
+      "header_text_color_rgb": [
+        255,
+        255,
+        255
+      ],
+      "row_fill_color_rgb": [
+        250,
+        250,
+        252
+      ],
+      "alternate_row_fill_color_rgb": [
+        235,
+        240,
+        246
+      ],
+      "cell_padding": {
+        "top": 6,
+        "right": 8,
+        "bottom": 6,
+        "left": 8
+      }
+    }
+  },
+  "csv": {
+    "first_row_is_header": true,
+    "delimiter": ",",
+    "columns": [
+      {
+        "index": 0,
+        "width_weight": 2,
+        "text_align": "left"
+      },
+      {
+        "index": 1,
+        "width_weight": 3,
+        "text_align": "left"
+      },
+      {
+        "index": 2,
+        "width_weight": 1,
+        "text_align": "right"
+      }
+    ]
+  }
+}'''),
+}
+response = requests.post(api_url + "/pdf", json=payload, headers={
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Api-Key": api_key,
+})
+
+print("Response status code: " + str(response.status_code))
+if response.ok:
+    print(json.dumps(response.json(), indent=2))
+else:
+    print(response.text)
+    raise SystemExit(1)
+

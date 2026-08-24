@@ -1,0 +1,103 @@
+import json
+import os
+import sys
+import requests
+
+# By default, we use the US-based API service. This is the primary endpoint for global use.
+api_url = os.environ.get("PDFREST_URL", "https://api.pdfrest.com")
+
+# This sample converts JSON input to a tagged PDF through multipart /pdf.
+# It demonstrates structured_text_options and the format-specific conversion options.
+input_path = sys.argv[1] if len(sys.argv) > 1 else "/path/to/sample.json"
+api_key = os.environ.get("PDFREST_API_KEY", "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
+options = json.loads(r'''{
+  "title": "Structured Content Sample",
+  "language": "en-US",
+  "enable_tagging": true,
+  "page_setup": {
+    "size": "Letter",
+    "orientation": "portrait",
+    "margin": {
+      "top": 36,
+      "right": 42,
+      "bottom": 36,
+      "left": 42
+    }
+  },
+  "style": {
+    "font": "Arial",
+    "heading_font": "Arial",
+    "code_font": "Courier",
+    "text_size": 11,
+    "text_color_rgb": [
+      34,
+      34,
+      34
+    ],
+    "heading_scale": 1.35,
+    "table": {
+      "column_width_weights": [
+        2,
+        3,
+        2
+      ],
+      "keep_header_with_first_row": true,
+      "repeat_headers_on_overflow": true,
+      "show_borders": true,
+      "border_width": 0.75,
+      "border_color_rgb": [
+        180,
+        188,
+        200
+      ],
+      "header_fill_color_rgb": [
+        33,
+        64,
+        98
+      ],
+      "header_text_color_rgb": [
+        255,
+        255,
+        255
+      ],
+      "row_fill_color_rgb": [
+        250,
+        250,
+        252
+      ],
+      "alternate_row_fill_color_rgb": [
+        235,
+        240,
+        246
+      ],
+      "cell_padding": {
+        "top": 6,
+        "right": 8,
+        "bottom": 6,
+        "left": 8
+      }
+    }
+  },
+  "data_presentation": "hierarchy"
+}''')
+
+from requests_toolbelt import MultipartEncoder
+with open(input_path, "rb") as input_file:
+    fields = {
+        "file": (os.path.basename(input_path), input_file, "text/plain"),
+        "structured_text_options": json.dumps(options),
+    }
+    form = MultipartEncoder(fields=fields)
+    response = requests.post(api_url + "/pdf", data=form, headers={
+        "Accept": "application/json",
+        "Content-Type": form.content_type,
+        "Api-Key": api_key,
+    })
+
+print("Response status code: " + str(response.status_code))
+if response.ok:
+    print(json.dumps(response.json(), indent=2))
+else:
+    print(response.text)
+    raise SystemExit(1)
+
