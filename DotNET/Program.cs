@@ -14,6 +14,9 @@ static void PrintUsage()
     Console.Error.WriteLine("    markdown-json <pdf>                 Convert PDF to Markdown");
     Console.Error.WriteLine("    rasterized-pdf <pdf>               Rasterize PDF pages");
     Console.Error.WriteLine("    pdf <file>                         Convert file to PDF");
+    Console.Error.WriteLine("    pdf-from-email <file>              Convert Email (.eml) to PDF");
+    Console.Error.WriteLine("    pdf-from-postscript <ps> <jobOptions>  Convert PostScript to PDF");
+    Console.Error.WriteLine("    postscript <pdf>                   Convert PDF to PostScript");
     Console.Error.WriteLine("    pdf-from-markdown|csv|json|xml|text <file>  Structured input to PDF");
     Console.Error.WriteLine("    pdfa <file>                        Convert to PDF/A");
     Console.Error.WriteLine("    pdfx <file>                        Convert to PDF/X");
@@ -67,6 +70,9 @@ static void PrintUsage()
     Console.Error.WriteLine("Multipart Payload (multipart/form-data):");
     Console.Error.WriteLine("  Conversions:");
     Console.Error.WriteLine("    pdf-multipart <file>               Convert to PDF");
+    Console.Error.WriteLine("    pdf-from-email-multipart <file>    Convert Email (.eml) to PDF");
+    Console.Error.WriteLine("    pdf-from-postscript-multipart <ps> <jobOptions>  Convert PostScript to PDF");
+    Console.Error.WriteLine("    postscript-multipart <pdf>         Convert PDF to PostScript");
     Console.Error.WriteLine("    pdf-from-markdown|csv|json|xml|text-multipart <file>  Structured input to PDF");
     Console.Error.WriteLine("    markdown-multipart <file>          Convert to Markdown");
     Console.Error.WriteLine("    rasterized-pdf-multipart <pdf>     Rasterize PDF");
@@ -128,6 +134,7 @@ static void PrintUsage()
     Console.Error.WriteLine("  protected-watermark <pdf>                  Watermark then restrict");
     Console.Error.WriteLine("  redact-preview-and-finalize <pdf>          Preview then apply redactions\n");
     Console.Error.WriteLine("  create-invoice-from-structured-data         Generate invoice from JSON and CSV\n");
+    Console.Error.WriteLine("  refry-pdf <pdf> <jobOptions> [outputPdf]    Convert PDF to PostScript and back\n");
 
     Console.Error.WriteLine("Environment (.env supported):");
     Console.Error.WriteLine("  PDFREST_API_KEY=...    Required API key");
@@ -166,6 +173,15 @@ switch (cmd)
     case "pdf-multipart":
         await Samples.EndpointExamples.MultipartPayload.Pdf.Execute(rest);
         break;
+    case "pdf-from-email":
+        await Samples.EndpointExamples.JsonPayload.PdfFromEmail.Execute(rest);
+        break;
+    case "pdf-from-postscript":
+        await Samples.EndpointExamples.JsonPayload.PdfFromPostscript.Execute(rest);
+        break;
+    case "postscript":
+        await Samples.EndpointExamples.JsonPayload.Postscript.Execute(rest);
+        break;
     case "pdf-from-markdown":
         await Samples.EndpointExamples.JsonPayload.PdfFromMarkdown.Execute(rest);
         break;
@@ -180,6 +196,15 @@ switch (cmd)
         break;
     case "pdf-from-text":
         await Samples.EndpointExamples.JsonPayload.PdfFromText.Execute(rest);
+        break;
+    case "pdf-from-email-multipart":
+        await Samples.EndpointExamples.MultipartPayload.PdfFromEmail.Execute(rest);
+        break;
+    case "pdf-from-postscript-multipart":
+        await Samples.EndpointExamples.MultipartPayload.PdfFromPostscript.Execute(rest);
+        break;
+    case "postscript-multipart":
+        await Samples.EndpointExamples.MultipartPayload.Postscript.Execute(rest);
         break;
     case "pdf-from-markdown-multipart":
         await Samples.EndpointExamples.MultipartPayload.PdfFromMarkdown.Execute(rest);
@@ -253,6 +278,9 @@ switch (cmd)
         break;
     case "create-invoice-from-structured-data":
         await Samples.ComplexFlowExamples.CreateInvoiceFromStructuredData.Execute(rest);
+        break;
+    case "refry-pdf":
+        await Samples.ComplexFlowExamples.RefryPdf.Execute(rest);
         break;
     case "extracted-text":
         await Samples.EndpointExamples.JsonPayload.ExtractedText.Execute(rest);
