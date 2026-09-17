@@ -19,7 +19,7 @@ static void PrintUsage()
     Console.Error.WriteLine("    postscript <pdf>                   Convert PDF to PostScript");
     Console.Error.WriteLine("    pdf-from-markdown|csv|json|xml|text <file>  Structured input to PDF");
     Console.Error.WriteLine("    pdfa <file>                        Convert to PDF/A");
-    Console.Error.WriteLine("    zugferd-pdf <xml>                  Create a ZUGFeRD / Factur-X PDF/A-3 invoice");
+    Console.Error.WriteLine("    zugferd-pdf <xml> <pdf>            Create a ZUGFeRD / Factur-X PDF/A-3 invoice");
     Console.Error.WriteLine("    pdfx <file>                        Convert to PDF/X");
     Console.Error.WriteLine("    tdm-reserved-pdf <pdf>             Apply TDM rights metadata");
     Console.Error.WriteLine("    png|jpg|gif|bmp <file>             Convert to image format");
@@ -79,7 +79,7 @@ static void PrintUsage()
     Console.Error.WriteLine("    markdown-multipart <file>          Convert to Markdown");
     Console.Error.WriteLine("    rasterized-pdf-multipart <pdf>     Rasterize PDF");
     Console.Error.WriteLine("    pdfa-multipart <file>              Convert to PDF/A");
-    Console.Error.WriteLine("    zugferd-pdf-multipart <xml>        Create a ZUGFeRD / Factur-X PDF/A-3 invoice");
+    Console.Error.WriteLine("    zugferd-pdf-multipart <xml> <pdf>  Create a ZUGFeRD / Factur-X PDF/A-3 invoice");
     Console.Error.WriteLine("    pdfx-multipart <file>              Convert to PDF/X");
     Console.Error.WriteLine("    tdm-reserved-pdf-multipart <pdf>   Apply TDM rights metadata");
     Console.Error.WriteLine("    png-multipart|jpg-multipart|gif-multipart|bmp-multipart|tif-multipart <file>  Convert to image");

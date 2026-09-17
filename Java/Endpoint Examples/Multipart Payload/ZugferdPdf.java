@@ -9,13 +9,14 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.json.JSONObject;
 
-// Create a ZUGFeRD / Factur-X PDF/A-3 invoice from invoice XML.
+// Create a ZUGFeRD / Factur-X PDF/A-3 invoice from XML and an existing invoice PDF.
 public class ZugferdPdf {
   private static final String API_URL = "https://api.pdfrest.com";
   private static final String DEFAULT_API_KEY = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
 
   public static void main(String[] args) throws IOException {
     File invoiceXml = new File(args.length > 0 ? args[0] : "/path/to/invoice.xml");
+    File invoicePdf = new File(args.length > 1 ? args[1] : "/path/to/invoice.pdf");
     String apiKey =
         Dotenv.configure()
             .ignoreIfMalformed()
@@ -36,6 +37,11 @@ public class ZugferdPdf {
                 "file",
                 invoiceXml.getName(),
                 RequestBody.create(invoiceXml, MediaType.parse("application/xml")))
+            .addFormDataPart(
+                "pdf_file",
+                invoicePdf.getName(),
+                RequestBody.create(invoicePdf, MediaType.parse("application/pdf")))
+            .addFormDataPart("regenerate_pdf", "true")
             .addFormDataPart("render_options", options.toString())
             .addFormDataPart("output", "zugferd_invoice")
             .build();
