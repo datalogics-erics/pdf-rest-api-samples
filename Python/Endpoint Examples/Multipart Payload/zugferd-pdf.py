@@ -4,6 +4,7 @@ import requests
 from requests_toolbelt import MultipartEncoder
 
 # Create a ZUGFeRD / Factur-X PDF/A-3 invoice from XML and an existing invoice PDF.
+# pdfRest preserves the supplied PDF when it agrees with the canonical XML.
 api_url = "https://api.pdfrest.com"
 # api_url = "https://eu-api.pdfrest.com"  # EU/GDPR service
 api_key = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
@@ -15,7 +16,9 @@ with open(invoice_xml, "rb") as source:
         form = MultipartEncoder(fields={
             "file": (os.path.basename(invoice_xml), source, "application/xml"),
             "pdf_file": (os.path.basename(invoice_pdf), pdf_source, "application/pdf"),
+            # Fallback: generate a replacement PDF for a mismatch or unconfirmed PDF/XML match.
             "regenerate_pdf": "true",
+            # These styles apply only to that fallback-generated PDF, not to a preserved PDF.
             "render_options": json.dumps({"locale": "de-DE", "label_language": "de", "font": "arial", "bold_font": "arialbold", "accent_color_rgb": [0, 92, 171]}),
             "output": "zugferd_invoice",
         })

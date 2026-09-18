@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # Upload invoice XML and PDF, then create a ZUGFeRD / Factur-X PDF/A-3 invoice by resource ID.
+# pdfRest preserves the supplied PDF when it agrees with the canonical XML.
 API_URL="https://api.pdfrest.com"
 # API_URL="https://eu-api.pdfrest.com" # EU/GDPR service
 API_KEY="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" # Replace with your API key
@@ -23,6 +24,8 @@ PDF_ID=$(curl --silent --show-error --location "$API_URL/upload" \
 
 test -n "$PDF_ID" && test "$PDF_ID" != "null" || { echo "PDF upload failed" >&2; exit 1; }
 
+# `regenerate_pdf` enables a fallback replacement PDF for a mismatch or unconfirmed match.
+# `render_options` style that fallback PDF only; they do not alter a preserved supplied PDF.
 curl --location "$API_URL/zugferd-pdf" \
   --header "Accept: application/json" \
   --header "Api-Key: $API_KEY" \

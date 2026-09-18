@@ -4,6 +4,7 @@ require 'vendor/autoload.php';
 use GuzzleHttp\Client;
 
 // Upload invoice XML and PDF, then create a ZUGFeRD / Factur-X PDF/A-3 invoice by resource ID.
+// pdfRest preserves the supplied PDF when it agrees with the canonical XML.
 $apiUrl = 'https://api.pdfrest.com';
 // $apiUrl = 'https://eu-api.pdfrest.com'; // EU/GDPR service
 $apiKey = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx';
@@ -25,6 +26,8 @@ $pdfUpload = $client->post($apiUrl . '/upload', [
 if ($pdfUpload->getStatusCode() >= 300) { fwrite(STDERR, (string) $pdfUpload->getBody()); exit(1); }
 $pdfId = json_decode($pdfUpload->getBody(), true)['files'][0]['id'];
 
+// Fallback generation handles a mismatch or an unconfirmed PDF/XML match.
+// The render options style only that replacement PDF, not a preserved supplied PDF.
 $response = $client->post($apiUrl . '/zugferd-pdf', [
     'headers' => ['Accept' => 'application/json', 'Api-Key' => $apiKey],
     'json' => ['id' => $xmlId, 'pdf_id' => $pdfId, 'regenerate_pdf' => true, 'output' => 'zugferd_invoice', 'render_options' => ['locale' => 'de-DE', 'label_language' => 'de', 'font' => 'arial', 'bold_font' => 'arialbold', 'accent_color_rgb' => [0, 92, 171]]],

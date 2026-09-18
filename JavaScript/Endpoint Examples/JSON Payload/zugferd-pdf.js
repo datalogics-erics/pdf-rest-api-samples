@@ -1,4 +1,5 @@
 // Upload invoice XML and PDF, then create a ZUGFeRD / Factur-X PDF/A-3 invoice by resource ID.
+// pdfRest preserves the supplied PDF when it agrees with the canonical XML.
 const axios = require("axios");
 const fs = require("fs");
 const path = require("path");
@@ -18,6 +19,8 @@ async function createZugferdPdf() {
     headers: { "Api-Key": apiKey, "Content-Type": "application/pdf", "Content-Filename": path.basename(invoicePdf) },
     maxBodyLength: Infinity,
   });
+  // Fallback generation handles a mismatch or an unconfirmed PDF/XML match.
+  // The render options style only that replacement PDF, not a preserved supplied PDF.
   const response = await axios.post(`${apiUrl}/zugferd-pdf`, {
     id: upload.data.files[0].id, pdf_id: pdfUpload.data.files[0].id, regenerate_pdf: true, output: "zugferd_invoice",
     render_options: { locale: "de-DE", label_language: "de", font: "arial", bold_font: "arialbold", accent_color_rgb: [0, 92, 171] },

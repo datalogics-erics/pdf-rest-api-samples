@@ -1,6 +1,8 @@
 /*
  * What this sample does:
  * - Uploads invoice XML and PDF, then creates a ZUGFeRD / Factur-X PDF/A-3 invoice using resource IDs.
+ * - Preserves the supplied PDF when it agrees with the canonical XML.
+ * - Regenerates a styled replacement only for a mismatch or unconfirmed PDF/XML match.
  *
  * Setup (environment):
  * - Copy .env.example to .env and set PDFREST_API_KEY=your_api_key_here.
@@ -39,6 +41,7 @@ public static class ZugferdPdf
         var pdfUploadBody = await pdfUpload.Content.ReadAsStringAsync();
         if (!pdfUpload.IsSuccessStatusCode) { Console.Error.WriteLine(pdfUploadBody); Environment.ExitCode = 1; return; }
         var pdfId = JObject.Parse(pdfUploadBody)["files"]![0]! ["id"]!.ToString();
+        // Render options style only a fallback-generated replacement, not a preserved PDF.
         var payload = new JObject { ["id"] = xmlId, ["pdf_id"] = pdfId, ["regenerate_pdf"] = true, ["output"] = "zugferd_invoice", ["render_options"] = new JObject { ["locale"] = "de-DE", ["label_language"] = "de", ["font"] = "arial", ["bold_font"] = "arialbold", ["accent_color_rgb"] = new JArray(0, 92, 171) } };
         var response = await client.PostAsync("zugferd-pdf", new StringContent(payload.ToString(), System.Text.Encoding.UTF8, "application/json"));
         Console.WriteLine(await response.Content.ReadAsStringAsync());

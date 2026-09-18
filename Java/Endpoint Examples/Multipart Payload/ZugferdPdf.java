@@ -1,6 +1,7 @@
 import io.github.cdimascio.dotenv.Dotenv;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -10,9 +11,12 @@ import okhttp3.Response;
 import org.json.JSONObject;
 
 // Create a ZUGFeRD / Factur-X PDF/A-3 invoice from XML and an existing invoice PDF.
+// pdfRest preserves the supplied PDF when it agrees with the canonical XML.
 public class ZugferdPdf {
   private static final String API_URL = "https://api.pdfrest.com";
   private static final String DEFAULT_API_KEY = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
+  private static final OkHttpClient CLIENT =
+      new OkHttpClient.Builder().readTimeout(60, TimeUnit.SECONDS).build();
 
   public static void main(String[] args) throws IOException {
     File invoiceXml = new File(args.length > 0 ? args[0] : "/path/to/invoice.xml");
@@ -30,6 +34,8 @@ public class ZugferdPdf {
             .put("font", "arial")
             .put("bold_font", "arialbold")
             .put("accent_color_rgb", new int[] {0, 92, 171});
+    // Fallback generation handles a mismatch or an unconfirmed PDF/XML match.
+    // The render options style only that replacement PDF, not a preserved supplied PDF.
     MultipartBody body =
         new MultipartBody.Builder()
             .setType(MultipartBody.FORM)
@@ -54,7 +60,7 @@ public class ZugferdPdf {
   }
 
   private static void send(Request request) throws IOException {
-    try (Response response = new OkHttpClient().newCall(request).execute()) {
+    try (Response response = CLIENT.newCall(request).execute()) {
       String body = response.body() == null ? "" : response.body().string();
       System.out.println(body);
       if (!response.isSuccessful()) {

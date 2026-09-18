@@ -1,6 +1,8 @@
 /*
  * What this sample does:
  * - Creates a ZUGFeRD / Factur-X PDF/A-3 invoice from XML and an existing PDF through multipart/form-data.
+ * - Preserves the supplied PDF when it agrees with the canonical XML.
+ * - Regenerates a styled replacement only for a mismatch or unconfirmed PDF/XML match.
  *
  * Setup (environment):
  * - Copy .env.example to .env and set PDFREST_API_KEY=your_api_key_here.
@@ -32,6 +34,7 @@ public static class ZugferdPdf
         var pdf = new ByteArrayContent(await File.ReadAllBytesAsync(invoicePdf));
         pdf.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
         form.Add(pdf, "pdf_file", Path.GetFileName(invoicePdf));
+        // Render options style only a fallback-generated replacement, not a preserved PDF.
         form.Add(new StringContent("true"), "regenerate_pdf");
         form.Add(new StringContent(new JObject { ["locale"] = "de-DE", ["label_language"] = "de", ["font"] = "arial", ["bold_font"] = "arialbold", ["accent_color_rgb"] = new JArray(0, 92, 171) }.ToString()), "render_options");
         form.Add(new StringContent("zugferd_invoice"), "output");
