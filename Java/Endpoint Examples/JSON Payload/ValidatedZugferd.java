@@ -13,7 +13,8 @@ public class ValidatedZugferd {
   // By default, we use the US-based API service. This is the primary endpoint for global use.
   private static final String API_URL = "https://api.pdfrest.com";
 
-  // For GDPR compliance and enhanced performance for European users, use the EU-based service instead.
+  // For GDPR compliance and enhanced performance for European users, use the EU-based service
+  // instead.
   // For more information visit https://pdfrest.com/pricing#how-do-eu-gdpr-api-calls-work
   // private static final String API_URL = "https://eu-api.pdfrest.com";
 
@@ -24,7 +25,8 @@ public class ValidatedZugferd {
       new OkHttpClient.Builder().readTimeout(60, TimeUnit.SECONDS).build();
 
   public static void main(String[] args) throws IOException {
-    // Specify the completed hybrid ZUGFeRD or Factur-X PDF path here, or as the first program argument.
+    // Specify the completed hybrid ZUGFeRD or Factur-X PDF path here, or as the first program
+    // argument.
     File zugferdPdf = new File(args.length > 0 ? args[0] : "/path/to/zugferd-invoice.pdf");
     String apiKey =
         Dotenv.configure()
