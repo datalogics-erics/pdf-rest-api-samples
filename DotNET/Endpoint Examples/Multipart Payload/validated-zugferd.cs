@@ -4,9 +4,15 @@
  *
  * Setup (environment):
  * - Copy .env.example to .env and set PDFREST_API_KEY=your_api_key_here.
- * - Optionally set PDFREST_URL=https://eu-api.pdfrest.com for the EU/GDPR service.
+ * - Optional: set PDFREST_URL to override the API region. For EU/GDPR compliance and proximity, use:
+ *     PDFREST_URL=https://eu-api.pdfrest.com
+ *   For more information visit https://pdfrest.com/pricing#how-do-eu-gdpr-api-calls-work
  *
- * Usage: dotnet run -- validated-zugferd-multipart /path/to/zugferd-invoice.pdf
+ * Usage:
+ *   dotnet run -- validated-zugferd-multipart /path/to/zugferd-invoice.pdf
+ *
+ * Output:
+ * - Prints the validation JSON response and returns a nonzero exit code when the request fails.
  */
 using System.Net.Http.Headers;
 

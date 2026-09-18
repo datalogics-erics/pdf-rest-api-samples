@@ -1,20 +1,44 @@
 // Upload a hybrid PDF, then validate its ZUGFeRD / Factur-X package by resource ID.
-const axios = require("axios");
-const fs = require("fs");
-const path = require("path");
+var axios = require("axios");
+var fs = require("fs");
+var path = require("path");
 
-const apiUrl = "https://api.pdfrest.com";
-// const apiUrl = "https://eu-api.pdfrest.com"; // EU/GDPR service
-const apiKey = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
-const zugferdPdf = "/path/to/zugferd-invoice.pdf";
+// By default, we use the US-based API service. This is the primary endpoint for global use.
+var apiUrl = "https://api.pdfrest.com";
 
-async function validateZugferdPdf() {
-  const upload = await axios.post(`${apiUrl}/upload`, fs.createReadStream(zugferdPdf), {
-    headers: { "Api-Key": apiKey, "Content-Type": "application/pdf", "Content-Filename": path.basename(zugferdPdf) },
-    maxBodyLength: Infinity,
+/* For GDPR compliance and enhanced performance for European users, you can switch to the EU-based service by uncommenting the URL below.
+ * For more information visit https://pdfrest.com/pricing#how-do-eu-gdpr-api-calls-work
+ */
+//var apiUrl = "https://eu-api.pdfrest.com";
+
+// Set this path to the completed hybrid ZUGFeRD or Factur-X PDF you want to validate.
+var zugferdPdf = "/path/to/zugferd-invoice.pdf";
+var upload_config = {
+  method: "post",
+  maxBodyLength: Infinity,
+  url: apiUrl + "/upload",
+  headers: {
+    "Api-Key": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", // Replace with your API key
+    "Content-Filename": path.basename(zugferdPdf),
+    "Content-Type": "application/pdf",
+  },
+  data: fs.createReadStream(zugferdPdf),
+};
+
+axios(upload_config)
+  .then(function (upload_response) {
+    var validation_config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: apiUrl + "/validated-zugferd",
+      headers: { "Api-Key": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", "Content-Type": "application/json" },
+      data: { id: upload_response.data.files[0].id },
+    };
+    return axios(validation_config);
+  })
+  .then(function (response) {
+    console.log(JSON.stringify(response.data));
+  })
+  .catch(function (error) {
+    console.log(error);
   });
-  const response = await axios.post(`${apiUrl}/validated-zugferd`, { id: upload.data.files[0].id }, { headers: { "Api-Key": apiKey } });
-  console.log(JSON.stringify(response.data, null, 2));
-}
-
-validateZugferdPdf().catch((error) => { console.error(error.response?.data || error.message); process.exitCode = 1; });

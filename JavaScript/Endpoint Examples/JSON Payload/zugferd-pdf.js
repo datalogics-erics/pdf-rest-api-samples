@@ -1,31 +1,72 @@
 // Upload invoice XML and PDF, then create a ZUGFeRD / Factur-X PDF/A-3 invoice by resource ID.
-// pdfRest preserves the supplied PDF when it agrees with the canonical XML.
-const axios = require("axios");
-const fs = require("fs");
-const path = require("path");
+var axios = require("axios");
+var fs = require("fs");
+var path = require("path");
 
-const apiUrl = "https://api.pdfrest.com";
-// const apiUrl = "https://eu-api.pdfrest.com"; // EU/GDPR service
-const apiKey = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
-const invoiceXml = "/path/to/invoice.xml";
-const invoicePdf = "/path/to/invoice.pdf";
+// By default, we use the US-based API service. This is the primary endpoint for global use.
+var apiUrl = "https://api.pdfrest.com";
 
-async function createZugferdPdf() {
-  const upload = await axios.post(`${apiUrl}/upload`, fs.createReadStream(invoiceXml), {
-    headers: { "Api-Key": apiKey, "Content-Type": "application/xml", "Content-Filename": path.basename(invoiceXml) },
-    maxBodyLength: Infinity,
+/* For GDPR compliance and enhanced performance for European users, you can switch to the EU-based service by uncommenting the URL below.
+ * For more information visit https://pdfrest.com/pricing#how-do-eu-gdpr-api-calls-work
+ */
+//var apiUrl = "https://eu-api.pdfrest.com";
+
+// Set these paths to your CII XML invoice and the corresponding visual PDF.
+var invoiceXml = "/path/to/invoice.xml";
+var invoicePdf = "/path/to/invoice.pdf";
+
+var upload_config = {
+  method: "post",
+  maxBodyLength: Infinity,
+  url: apiUrl + "/upload",
+  headers: {
+    "Api-Key": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", // Replace with your API key
+    "Content-Filename": path.basename(invoiceXml),
+    "Content-Type": "application/xml",
+  },
+  data: fs.createReadStream(invoiceXml),
+};
+
+axios(upload_config)
+  .then(function (upload_response) {
+    var xmlId = upload_response.data.files[0].id;
+    var pdf_upload_config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: apiUrl + "/upload",
+      headers: {
+        "Api-Key": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", // Replace with your API key
+        "Content-Filename": path.basename(invoicePdf),
+        "Content-Type": "application/pdf",
+      },
+      data: fs.createReadStream(invoicePdf),
+    };
+    return axios(pdf_upload_config).then(function (pdf_upload_response) {
+      return { xmlId: xmlId, pdfId: pdf_upload_response.data.files[0].id };
+    });
+  })
+  .then(function (uploaded) {
+    // pdfRest preserves the supplied PDF when it agrees with the canonical XML.
+    // Fallback generation handles a mismatch or an unconfirmed PDF/XML match.
+    // The render options style only that replacement PDF, not a preserved supplied PDF.
+    var zugferd_config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: apiUrl + "/zugferd-pdf",
+      headers: { "Api-Key": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", "Content-Type": "application/json" },
+      data: {
+        id: uploaded.xmlId,
+        pdf_id: uploaded.pdfId,
+        regenerate_pdf: true,
+        output: "zugferd_invoice",
+        render_options: { locale: "de-DE", label_language: "de", font: "arial", bold_font: "arialbold", accent_color_rgb: [0, 92, 171] },
+      }
+    };
+    return axios(zugferd_config);
+  })
+  .then(function (response) {
+    console.log(JSON.stringify(response.data));
+  })
+  .catch(function (error) {
+    console.log(error);
   });
-  const pdfUpload = await axios.post(`${apiUrl}/upload`, fs.createReadStream(invoicePdf), {
-    headers: { "Api-Key": apiKey, "Content-Type": "application/pdf", "Content-Filename": path.basename(invoicePdf) },
-    maxBodyLength: Infinity,
-  });
-  // Fallback generation handles a mismatch or an unconfirmed PDF/XML match.
-  // The render options style only that replacement PDF, not a preserved supplied PDF.
-  const response = await axios.post(`${apiUrl}/zugferd-pdf`, {
-    id: upload.data.files[0].id, pdf_id: pdfUpload.data.files[0].id, regenerate_pdf: true, output: "zugferd_invoice",
-    render_options: { locale: "de-DE", label_language: "de", font: "arial", bold_font: "arialbold", accent_color_rgb: [0, 92, 171] },
-  }, { headers: { "Api-Key": apiKey } });
-  console.log(JSON.stringify(response.data, null, 2));
-}
-
-createZugferdPdf().catch((error) => { console.error(error.response?.data || error.message); process.exitCode = 1; });
